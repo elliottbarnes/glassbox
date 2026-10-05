@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Look inside a real compiler. Turn a small typed language into WebAssembly, inspect every stage, and compare execution with a reference interpreter.">
+  <meta name="theme-color" content="#101216">
+  <title>Glassbox — a compiler you can look inside</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='15' fill='%23101216'/%3E%3Cpath d='M16 22 32 13 48 22v20L32 51 16 42ZM16 22l16 10 16-10M32 32v19' fill='none' stroke='%23c6b3ff' stroke-width='3'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <header class="header shell">
+    <a class="brand" href="./" aria-label="Glassbox home"><svg width="30" height="34" viewBox="0 0 32 36" aria-hidden="true"><path d="M2 9 16 1 30 9v17L16 34 2 26ZM2 9l14 9 14-9M16 18v16" fill="none" stroke="currentColor" stroke-width="1.6"/></svg><span>glassbox</span></a>
+    <div class="header-right"><span class="eyebrow desktop-only">A COMPILER WORKSHOP</span><a href="#under-the-hood">How it works <span aria-hidden="true">↘</span></a><a href="https://github.com/elliottbarnes/glassbox" target="_blank" rel="noopener">Source <span aria-hidden="true">↗</span></a></div>
+  </header>
+  <main class="shell">
+    <section class="hero" aria-labelledby="heading">
+      <div><div class="eyebrow intro"><span class="dot"></span> SOURCE IN. UNDERSTANDING OUT.</div><h1 id="heading">A small language.<br>A <em>real</em> compiler.</h1><p>Follow your code from its first token to running WebAssembly. Open the box. See what changes, and why.</p></div>
+      <div class="hero-note"><span class="note-symbol" aria-hidden="true">{ → }</span><span>Written from scratch.</span><p>Typed functions, loops, optimizations, and a binary backend. Every result below comes from your code.</p><div class="tags"><span>i32 + bool</span><span>Zero dependencies</span></div></div>
+    </section>
+
+    <section class="workshop" aria-label="Interactive compiler workshop">
+      <div class="workshop-bar"><div class="workshop-title"><span class="dot green"></span> COMPILER LAB <span class="version">v0.1</span></div><span id="build-status" class="build-status" role="status">Ready to compile</span></div>
+      <div class="workspace">
+        <div class="source-panel">
+          <div class="panel-toolbar"><label for="example" class="small-label">SOURCE</label><select id="example" aria-label="Choose a code example"><option value="folding">01 · Make a branch disappear</option><option value="gcd">02 · Euclid's algorithm</option><option value="factorial">03 · Recursive factorial</option><option value="shortcircuit">04 · Skip a trap</option><option value="budget">05 · Stop an endless loop</option></select></div>
+          <div class="editor-wrap"><div id="line-numbers" class="line-numbers" aria-hidden="true"></div><textarea id="source" aria-label="Glassbox source code" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" wrap="off"></textarea></div>
+          <div class="editor-bottom"><span id="source-info">main.glass</span><button id="reset" class="text-button" type="button">Reset example</button></div>
+          <div class="run-controls"><button id="compile" class="primary-button" type="button"><span aria-hidden="true">▶</span> Compile & run <kbd id="shortcut">⌘ ↵</kbd></button><span class="local-note">Runs in your browser</span></div>
+          <div id="diagnostic" class="diagnostic" role="alert" hidden></div>
+        </div>
+        <div class="inspect-panel">
+          <div class="stage-tabs" role="tablist" aria-label="Compiler stages"><button id="tab-ast" role="tab" aria-selected="false" aria-controls="stage-panel" data-stage="ast"><span>01</span> Syntax tree</button><button id="tab-ir" role="tab" aria-selected="false" aria-controls="stage-panel" data-stage="ir"><span>02</span> Typed IR</button><button id="tab-optimized" role="tab" aria-selected="true" aria-controls="stage-panel" data-stage="optimized"><span>03</span> Optimized</button><button id="tab-wasm" role="tab" aria-selected="false" aria-controls="stage-panel" data-stage="wasm"><span>04</span> Wasm</button></div>
+          <div id="stage-panel" role="tabpanel" aria-labelledby="tab-optimized"><div class="stage-heading"><div><h2 id="stage-title">Less work. Same answer.</h2><p id="stage-description">Constants folded, dead branches removed.</p></div><span id="stage-badge" class="stage-badge">STRUCTURED IR</span></div><pre id="stage-code" class="stage-code" tabindex="0" aria-label="Compiler stage output">Compiling the first example…</pre><div class="stage-footer"><span id="stage-info">Waiting for compiler</span><button id="download" type="button" class="text-button" disabled>Download .wasm <span aria-hidden="true">↓</span></button></div></div>
+        </div>
+      </div>
+      <div class="result-strip"><div class="result-heading"><span class="small-label">PROGRAM RESULT</span><div><strong id="result-value">—</strong><span id="result-type">i32</span></div></div><div class="engine-results"><div><span>Reference interpreter</span><strong id="result-reference">—</strong></div><div><span>Wasm · unoptimized</span><strong id="result-basic">—</strong></div><div><span>Wasm · optimized</span><strong id="result-optimized">—</strong></div></div><div class="verification"><span id="agreement" class="agreement">Waiting for execution</span><span id="fuel-info">100,000 units of execution fuel</span></div></div>
+    </section>
+
+    <section class="changes-section" aria-labelledby="changes-heading"><div class="section-label"><h2 id="changes-heading">The transformation log</h2><span id="change-count">0 changes</span></div><div id="changes" class="changes"><p>Compile a program to inspect its transformations.</p></div><p class="fine-print">Click a transformation to select its source. Module size includes execution-budget instrumentation; smaller code does not necessarily run faster.</p></section>
+
+    <section id="under-the-hood" class="explanation" aria-labelledby="architecture-heading"><div><span class="eyebrow">UNDER THE HOOD</span><h2 id="architecture-heading">No magic.<br>Just a pipeline.</h2><p>A real lexer, parser, type checker, structured intermediate representation, optimizer, and WebAssembly binary encoder. The browser validates and executes the generated module.</p><a class="inline-link" href="https://github.com/elliottbarnes/glassbox#architecture" target="_blank" rel="noopener">Read the architecture <span aria-hidden="true">↗</span></a></div><ol class="pipeline"><li><span>01</span><div><h3>Give source a shape</h3><p>Tokens become a syntax tree. Names resolve to numbered slots. Types are checked before execution.</p></div></li><li><span>02</span><div><h3>Remove unnecessary work</h3><p>Fold constant expressions and remove unreachable branches while preserving overflow, traps, and short-circuit behavior.</p></div></li><li><span>03</span><div><h3>Emit actual machine-readable code</h3><p>Encode a WebAssembly module directly, then compare its answer with an independent execution path.</p></div></li></ol></section>
+    <details class="language-guide"><summary>The language, its limits, and execution safety <span aria-hidden="true">+</span></summary><div class="guide-content"><div><h3>Small by design</h3><p>Use <code>fn</code>, <code>let</code>, <code>return</code>, <code>if / else</code>, and <code>while</code>. Every variable, parameter, and function result has type <code>i32</code> or <code>bool</code>. Locals are mutable. Arithmetic wraps to signed 32 bits; division by zero and signed division overflow trap. Boolean <code>&&</code> and <code>||</code> short-circuit.</p></div><div><h3>Explicit boundaries</h3><p>No strings, arrays, heap, imports, or I/O. Every function must visibly return on all paths. This uses structured IR, not SSA, and does not perform register allocation. The reference interpreter limits call depth to 128 in this demo; browser Wasm recursion limits can differ.</p></div><div><h3>A bounded experiment</h3><p>Each execution has 100,000 units of fuel: one per function entry and loop-condition check. Optimization can reduce fuel use, so exhaustion is a resource limit, not a claim of semantic disagreement. Work happens in a fresh Worker, terminated after three seconds. Source stays in this page and is not sent to a service.</p></div></div></details>
+  </main>
+  <footer class="shell footer"><span>GLASSBOX <span class="muted">/</span> A study in how code becomes computation.</span><a href="https://elliottbarnes.ca/">elliott <span aria-hidden="true">↗</span></a></footer>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
